@@ -19,75 +19,40 @@ class TaskClass{
 	
 			echo date('Y-m-d H:i:s')."\n";
 			
-			if($this->configArr['tb_tasks_status']){
-				$res = $this->getList('tasks', 'tb'); //淘宝浏览单
-				$taskList = array_slice($res->list, 0, 3);	
-				$task = $this->selectOrder($taskList);	
-				if($task != null){ //如果接到了任务，打印任务信息，不再继续循环
-					$r = $this->grabTask($task->id, $task->not_match);
-					if($r->code == '000'){
-						$this->prompt('淘宝浏览单',$task);
-						break;
-					}		
-				}
-			}
-			
-			if($this->configArr['tb_order_status']){
-				sleep(mt_rand(0,2));
-				
-				$res = $this->getList('order', 'tb'); //淘宝购买单
-				$taskList = array_slice($res->list, 0, 3);	
-				$task = $this->selectOrder($taskList, 8.0);	
-				if($task != null){ //如果接到了任务，打印任务信息，不再继续循环
-					$r = $this->grabTask($task->id, $task->not_match);
-					if($r->code == '000'){
-						$this->prompt('淘宝购买单',$task);
-						break;
-					}		
-				}
-			}
-			
-			if($this->configArr['jd_order_status']){
-				sleep(mt_rand(0,2));
-				
-				$res = $this->getList('order', 'jd'); //京东购买单
-				$taskList = array_slice($res->list, 0, 3);	
-				$task = $this->selectOrder($taskList);	
-				if($task != null){ //如果接到了任务，打印任务信息，不再继续循环
-					$r = $this->grabTask($task->id, $task->not_match);
-					if($r->code == '000'){
-						$this->prompt('京东购买单',$task);
-						break;
-					}		
-				}
-			}
-			
-			if($this->configArr['tb_order_status'] || $this->configArr['jd_order_status']){
-				sleep(mt_rand(0,2));
+
+			$res = $this->getList(); 
+			if(is_object($res)){
+				print_r($res);
 			} else {
-				$t = mt_rand(3,6)/100; //1~2分钟随机抢单
-				sleep($t*60);//定时
+				echo $res."\n";
 			}
-				
+		
+/* 			$taskList = array_slice($res->list, 0, 3);	
+			$task = $this->selectOrder($taskList);	
+			if($task != null){ //如果接到了任务，打印任务信息，不再继续循环
+				$r = $this->grabTask($task->id, $task->not_match);
+				if($r->code == '000'){
+					$this->prompt('淘宝浏览单',$task);
+					break;
+				}		
+			} */
+			if($res == '操作太频繁啦!! 请休息一下再试.'){
+				sleep(mt_rand(3,6)*60);
+			}else {
+				sleep(mt_rand(5,10));
+			}
+			
+	
 			
 		}
 	}
 	
 	
-	/**
-	 * type: tasks浏览单,order购买单
-	 * shop_type: tb淘宝,jd京东
-	 **/
-	function getList($type, $shop_type){
-		$url = 'http://api-wx.firstblog.cn/case/lists1?type=tasks&page=1&shop_type=tb&consumer_id='.$this->configArr['user_id'];
-		
-		$fields = array(
-			'type' => $type,
-			'page' => '1',
-			'shop_type' => $shop_type,
-			'consumer_id' => $this->configArr['user_id']
-		);
-		return $this->decode($this->post($url, $fields));
+	function getList(){
+		$url = 'http://www.lefenshou.com/user/Task/taskListData.html';
+		$res = $this->get($url);
+		$arr = $this->decode($res);
+		return empty($arr)?$res:$arr;
 	}
 
 	//选出订单
@@ -121,7 +86,7 @@ class TaskClass{
 		exec($this->app->env['prompt']['type'][$this->app->env['prompt']['type_id']]);
 	}
 
-	function post($url, $fields){
+	function post($url, $fields=array()){
 		
 		$cookie=dirname(__FILE__)."/cookie.txt";
 		curl_setopt ($this->ch, CURLOPT_COOKIEJAR, $cookie);
@@ -129,7 +94,8 @@ class TaskClass{
 		
 		curl_setopt($this->ch,CURLOPT_URL, $url);
 
-		$header = array('token:'.$this->configArr['token']);
+		//$header = array('token:'.$this->configArr['token']);
+		$header = array();
 
 		curl_setopt($this->ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 		curl_setopt($this->ch, CURLOPT_SSL_VERIFYHOST, FALSE);
@@ -139,8 +105,25 @@ class TaskClass{
 		curl_setopt($this->ch,CURLOPT_RETURNTRANSFER,true);
 
 		curl_setopt($this->ch,CURLOPT_HTTPHEADER,$header);
-		//curl_setopt($this->ch,CURLOPT_COOKIE,'__cfduid=db20d88022a01ad7e748371a590b21e141537496085; PHPSESSID=334u28d7so6scn2v20hufg0pn0; seccode=1wDd5Bsh9zGO5yWi6v2frWweze5hEd9zE6R6ger; mId=1582; mUser=zdad456');
+		curl_setopt($this->ch,CURLOPT_COOKIE,$this->configArr['cookie']);
+		curl_setopt($this->ch, CURLOPT_REFERER, $url); 
 		
+		return curl_exec($this->ch);
+	}
+	
+	function get($url){		
+		curl_setopt($this->ch,CURLOPT_URL, $url);
+
+		$header = array('User-Agent: Mozilla/5.0 (Linux; Android 9; Redmi K20 Pro Build/PKQ1.181121.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/74.0.3729.136');
+
+		curl_setopt($this->ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+		curl_setopt($this->ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+
+		curl_setopt($this->ch,CURLOPT_RETURNTRANSFER,true);
+
+		curl_setopt($this->ch,CURLOPT_HTTPHEADER,$header);
+		curl_setopt($this->ch,CURLOPT_COOKIE,$this->configArr['cookie'].time());
+		curl_setopt($this->ch, CURLOPT_REFERER, $url); 	
 		return curl_exec($this->ch);
 	}
 	 

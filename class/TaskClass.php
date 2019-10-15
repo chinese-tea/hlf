@@ -21,10 +21,14 @@ class TaskClass{
 			
 
 			$res = $this->getList(); 
-			if(is_object($res)){
-				print_r($res);
+			if(is_object($res) && !empty($res->task_list)){
+				
+				$task = $this->selectOrder($res->task_list);print_r($res);
+				$res = grabTask($task);
+				break;
 			} else {
-				echo $res."\n";
+				print_r($res);
+				echo "\n";
 			}
 		
 /* 			$taskList = array_slice($res->list, 0, 3);	
@@ -57,28 +61,27 @@ class TaskClass{
 
 	//选出订单
 	function selectOrder($taskList, $momeylimit=0){
-		$shop_name = array('精品刺绣馆','远航汽车导航直销店','全国企业彩铃定制中心','涵生珠宝','倍乐熊旗舰店','一诺能量水晶','情简时尚女装','美之缘家居护理体验馆');
-		$task = null;
+		$max = 0;
 		foreach($taskList as $v){
-			//not_match意思是单子还没被抢完，然后在选出金额最大的那单
-			if($v->not_match == 0 && (!in_array($v->name, $shop_name)) && ((float)$v->money >= $momeylimit) && ($task == null || (float)$v->money > (float)$task->money)){
-				$task = $v;  
+			if($v->commission > $max){
+				$task = $v;
 			}
 		}
 		return $task;
 	}
 
 
-	function grabTask($id, $not_match){
-		$url = 'http://api-wx.firstblog.cn/case/getcase';
+	function grabTask($task){
+		$url = 'http://www.lefenshou.com/User/Task/grabTask.html';
 		$fields = array(
-			'type' => 'tasks',
-			'id' => $id,
-			'not_match' => $not_match,
-			'consumer_id' => $this->configArr['user_id']
+			'taskId' => $task->task_id,
+			'taskType' => $task->task_type,
+			'encrypt' => $task->encrypt,
+			'latitude' => '22.798689',
+			'altitude' => '108.422663'
 		);
-		
-		return $this->decode($this->post($url, $fields));
+		$res = $this->post($url, $fields);echo $res;
+		return $this->decode($res);
 	}
 
 	function prompt($name,$task){
@@ -87,15 +90,10 @@ class TaskClass{
 	}
 
 	function post($url, $fields=array()){
-		
-		$cookie=dirname(__FILE__)."/cookie.txt";
-		curl_setopt ($this->ch, CURLOPT_COOKIEJAR, $cookie);
-		curl_setopt ($this->ch, CURLOPT_COOKIEFILE, $cookie);
-		
+
 		curl_setopt($this->ch,CURLOPT_URL, $url);
 
-		//$header = array('token:'.$this->configArr['token']);
-		$header = array();
+		$header = array('User-Agent: Mozilla/5.0 (Linux; Android 9; Redmi K20 Pro Build/PKQ1.181121.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/74.0.3729.136');
 
 		curl_setopt($this->ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 		curl_setopt($this->ch, CURLOPT_SSL_VERIFYHOST, FALSE);
@@ -105,8 +103,7 @@ class TaskClass{
 		curl_setopt($this->ch,CURLOPT_RETURNTRANSFER,true);
 
 		curl_setopt($this->ch,CURLOPT_HTTPHEADER,$header);
-		curl_setopt($this->ch,CURLOPT_COOKIE,$this->configArr['cookie']);
-		curl_setopt($this->ch, CURLOPT_REFERER, $url); 
+		curl_setopt($this->ch, CURLOPT_REFERER, 'http://www.lefenshou.com/user/Task/taskList.html'); 
 		
 		return curl_exec($this->ch);
 	}
@@ -123,7 +120,7 @@ class TaskClass{
 
 		curl_setopt($this->ch,CURLOPT_HTTPHEADER,$header);
 		curl_setopt($this->ch,CURLOPT_COOKIE,$this->configArr['cookie'].time());
-		curl_setopt($this->ch, CURLOPT_REFERER, $url); 	
+		curl_setopt($this->ch, CURLOPT_REFERER, 'http://www.lefenshou.com/user/Task/taskList.html'); 	
 		return curl_exec($this->ch);
 	}
 	 

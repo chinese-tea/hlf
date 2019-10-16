@@ -23,6 +23,10 @@ class TaskClass{
 			$res = $this->getList(); 
 			if(is_object($res)){
 				print_r($res);
+				if(!empty($res->task_list)){
+					break;
+				}
+				
 			} else {
 				echo $res."\n";
 			}

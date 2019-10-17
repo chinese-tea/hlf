@@ -43,7 +43,7 @@ class TaskClass{
 			if($res == '操作太频繁啦!! 请休息一下再试.'){
 				sleep(mt_rand(3,6)*60);
 			}else {
-				sleep(mt_rand(5,10));
+				sleep(4);
 			}
 			
 	

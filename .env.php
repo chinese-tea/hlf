@@ -13,7 +13,7 @@ $ENV = array(
 $ENV_USER = array(
 	'15240651556' => array(
 			'user_name' => '15240651556',
-			'cookie' => 'Hm_lvt_ce95a344268cc53755b443ec5e99ac08=1569286963; PHPSESSID=0kepnqicovb1li8u6o550q1obu; Hm_lpvt_ce95a344268cc53755b443ec5e99ac08='
+			'cookie' => '_ga=GA1.2.543646921.1571295322; ci_session=ad788ef4ec6675a61bde5bcf39f8334a1ccca90f; __ads_session=nztrvFRHXgkR6kYq7gA='
 		),
 );
 	

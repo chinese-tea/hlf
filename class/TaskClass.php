@@ -37,7 +37,7 @@ echo '<pre>';
 				$td = $v->find('td', 7);
 				$a = $td->find('a',0);
 				$shopTel = $this->getTel($v);
-				if($this->canClick($shopTel) && $this->orderLimit($a->sum_price, 0, 300)){
+				if($this->canClick($shopTel) && $this->orderLimit($a->sum_price, 0, 500, $a->sum_point , 7, 10)){
 					$res = $this->checkOrder($a->offer_id);						
 					if($this->disClickStatus($res->code)){
 						array_push($this->disclickArr, $shopTel);
@@ -85,8 +85,8 @@ echo '<pre>';
 		return str_get_html($res);
 	}
 	
-	function orderLimit($money, $min=0, $max=500){
-		return $min <= $money && $money <= $max;
+	function orderLimit($money, $min=0, $max=500,$sum_point, $min_p, $max_p){
+		return $min <= $money && $money < $max && $min_p <= $sum_point && $sum_point < $max_p;
 	}
 	
 	function canClick($tel){
@@ -116,8 +116,11 @@ echo '<pre>';
 	}
 
 	function grabTask($offer_id){
-		$url = 'http://tao.huhuifu.com/order/step/'.$offer_id.'/418673';echo "<a href='$url'>$url</a>";
-		$res_code = $this->get($url);echo '状态吗：'.$res_code;exit;
+echo date('Y-m-d H:i:s')."\n";
+		sleep(5);
+echo date('Y-m-d H:i:s')."\n";
+		$url = 'http://tao.huhuifu.com/order/step/'.$offer_id.'/418673';echo "<a href='$url' target='_blank'>$url</a>";
+		$res_code = $this->get($url);echo '状态吗：';exit;
 		return $res_code == 200;
 	}
 

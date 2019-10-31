@@ -182,9 +182,9 @@ echo date('Y-m-d H:i:s')."\n";
 
 		curl_setopt($this->ch,CURLOPT_HTTPHEADER,$header);
 		
-		if($this->start_status){
+		if(false){ //$this->start_status
 			//curl_setopt ($this->ch, CURLOPT_COOKIEFILE, $cookie);
-			$cookie = 'BUY_RQF_TOKEN=57ebVs9b5gU7kdhz%2F9KDDKIH55qe9qqeyRqeJWajiVb3x7xKgHmCMeCcaZwfQjkQ5HvPnYDV7mTKpiPDKq5ah3KR8Uer7o0RWBZVRigMYnq%2BW3jUcw8hBa0xgTw; BUY_FOUL_CHECK=24fcWCAeEqIKVwkCglK%2F5dxrJ%2Bk%2FbL8bRAGIwvEV17j6SsqScPRYhdtkJmQ1ImAg9FE8k1PTU1m9zrKST8QaXQbLVqh2oMSPym3fTfr0MrX%2BnibjQpZuM2w17Tw; ci_session='.$this->ci_session.'; __ads_session='.$this->__ads_session;
+			$cookie = 'BUY_RQF_TOKEN=36bfFMUJ%2Fisl43eYhiJC1U6rnuJn9UoODaDYndXHwW4NjwvSY3VPolGWsmPiHE9b9CTFh9wmIYcapGJ4yT%2Bzx6%2FqLsSipKFOWN9TXaXWKg0q0J%2BXRHcQ%2BleuUNo; BUY_FOUL_CHECK=56f5LCgJ9X7%2BNZc%2FMJ7dheoN8qb9r%2BPFDKj3mcvGlxteUTo1pUs5j6aJ1otDKe7mhG4lQhwpVxSwB6k%2FBz1sCGy5BtSJS5pVpc2loC%2FoWRi9%2FQVY%2Bo4GXbbsS5s; ci_session='.$this->ci_session.'; __ads_session='.$this->__ads_session;
 			curl_setopt ($this->ch, CURLOPT_COOKIE, $cookie);
 		} else {
 			curl_setopt($this->ch,CURLOPT_COOKIE,$this->configArr['cookie']);
